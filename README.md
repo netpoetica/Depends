@@ -1,5 +1,7 @@
 # Depends
-## Simple cli for including common JavaScript libraries and/or a defined project structure
+### A simple cli for including common JavaScript libraries and/or a defined project structure
+
+----
 
 This started off as a quick diddy, but I'm seeing some major additions to it in the future. Currently it only includes:
 - Zepto
