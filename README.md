@@ -1,4 +1,4 @@
-# Depends
+# Depends[*](http://github.com/tmanderson/Depends#disclaimer)
 ### A simple cli for including common JavaScript libraries and/or a defined project structure
 
 ----
@@ -25,3 +25,8 @@ $> depends libs
 ```
 
 Libs will prompt you on the libraries you want to include.
+
+---
+
+##### Disclaimer
+This project has no relation to the well known incontinence products provider, [Depends](http://www.depend.com/). 
