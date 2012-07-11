@@ -1,0 +1,92 @@
+#!/bin/bash
+
+clear
+
+# create our array which is used to add script tags to index.html
+declare -a scripts=();
+
+curlRequest() {
+	curl --silent --create-dirs --output $1 $2
+}
+
+# probably don't need this anymore. Quicker call to echo with no new line.
+e() {
+	echo -en "$1"
+}
+
+# our lovely prompt
+prompt() {
+	while true; do
+		e "\033[34m$1\033[0m"
+	    read -p " " yn
+	    case $yn in
+	        [Yy]* ) curlRequest $2 $3; scripts=("${scripts[@]}" ${2:2}); break;;
+	        [Nn]* ) break;;
+	        * ) echo "Please answer yes or no.";;
+	    esac
+	done
+}
+
+underscore() {
+	prompt "Would you like to include Underscore?" ./js/lib/documentcloud/underscore.js http://documentcloud.github.com/underscore/underscore.js
+}
+
+backbone() {
+	prompt "Would you like to include Backbone?" ./js/lib/documentcloud/backbone.js http://documentcloud.github.com/backbone/backbone.js
+}
+
+zepto() {
+	prompt "Would you like to include Zepto?" ./js/lib/madrobby/zepto.js http://zeptojs.com/zepto.js
+}
+
+# call to run through prompts for all JS libraries
+libs() {
+	zepto
+	underscore
+	backbone
+}
+
+# I have more ideas for this, but for now just creates index and adds files
+templates() {
+	echo -e "<!doctype html>\n<html>\n<head>\n    <title></title>" > ./index.html
+
+	for s in ${scripts[@]}
+	do
+		echo -e "    <script type=\"text/javascript\" src=\""$s"\"></script>" >> ./index.html
+	done
+
+	echo -e "</head>\n<body>\n\n</body>\n</html>" >> ./index.html
+}
+
+for arg in "$@"
+do
+	if [ $arg = "create" ]
+	then
+		e "\033[32mCreating Project...\033[0m"
+
+		if [ -d ./js ]
+		then
+			rm -r ./js
+		fi
+
+		mkdir ./js
+		mkdir ./js/lib
+		mkdir ./js/models
+		mkdir ./js/stores
+		mkdir ./js/presenters
+
+		echo "//    Initialize your project here" > ./js/main.js
+
+		echo -e "\033[32mDone!\033[0m"
+
+		echo ""
+
+		libs
+		templates
+	fi
+
+	if [ $arg = "libs" ]
+	then
+		libs
+	fi
+done
