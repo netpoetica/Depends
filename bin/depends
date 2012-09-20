@@ -4,6 +4,7 @@ clear
 
 # create our array which is used to add script tags to index.html
 declare -a scripts=();
+declare -a styles=();
 
 curlRequest() {
 	curl --silent --create-dirs --output $1 $2
@@ -21,6 +22,20 @@ prompt() {
 	    read -p " " yn
 	    case $yn in
 	        [Yy]* ) curlRequest $2 $3; scripts=("${scripts[@]}" ${2:2}); break;;
+	        [Nn]* ) break;;
+	        * ) echo "Please answer yes or no.";;
+	    esac
+	done
+}
+
+# prompt the user and see if they'd like to create a css directory
+css(){
+	while true; do
+		e "Would you like to add a CSS directory?"
+		
+	    read yn
+	    case $yn in
+	        [Yy]* ) mkdir ./css; curlRequest ./css/normalize.css https://github.com/necolas/normalize.css; styles=("${styles[@]}" "./css/normalize.css"); break;;
 	        [Nn]* ) break;;
 	        * ) echo "Please answer yes or no.";;
 	    esac
@@ -49,7 +64,13 @@ libs() {
 # I have more ideas for this, but for now just creates index and adds files
 templates() {
 	echo -e "<!doctype html>\n<html>\n<head>\n    <title></title>" > ./index.html
-
+	
+	# add CSS to file
+	for s in ${styles[@]}
+	do
+		echo -e "    <link rel=\"stylesheet\" type=\"text/css\" href=\""$s"\" />" >> ./index.html
+	done
+	
 	for s in ${scripts[@]}
 	do
 		echo -e "    <script type=\"text/javascript\" src=\""$s"\"></script>" >> ./index.html
@@ -64,6 +85,11 @@ do
 	then
 		e "\033[32mCreating Project...\033[0m"
 
+		if [ index.html ]
+		then
+			rm -r index.html
+		fi
+		
 		if [ -d ./js ]
 		then
 			rm -r ./js
@@ -77,12 +103,24 @@ do
 
 		echo "//    Initialize your project here" > ./js/main.js
 
-		echo -e "\033[32mDone!\033[0m"
-
 		echo ""
 
+		echo -e "\033[32mAdd JS library dependencies...\033[0m"
 		libs
+		
+		echo ""
+
+		echo -e "\033[32mAdding CSS to project...\033[0m"
+		if [ -d ./css ]
+		then
+			rm -r ./css
+		fi
+		css 
+		
+		# build templates after css and JS array are populated
 		templates
+		
+		echo -e "\033[32mDone!\033[0m"
 	fi
 
 	if [ $arg = "libs" ]
